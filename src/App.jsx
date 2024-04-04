@@ -8,17 +8,25 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
+  SelectGroup,
+  SelectLabel,
 } from "@/components/ui/select";
-import { CalendarClock } from "lucide-react";
+
+import { CalendarClock,Trash2 } from "lucide-react";
 import { JsonForms } from "@jsonforms/react";
 import { useState } from "react";
-import { RadioButtonChecked, AutoAwesome } from "@mui/icons-material";
+import {
+  RadioButtonChecked,
+  AutoAwesome,
+  CheckBoxOutlined,
+} from "@mui/icons-material";
 // eslint-disable-next-line no-unused-vars
-import { schema, uischema, initialData } from "./config";
+import { schema, uischema, initialData, tableColumnsJson } from "./config";
 
 import { Button, buttonVariants } from "./components/ui/button";
 import { Input } from "./components/ui/input";
 import { Label } from "./components/ui/label";
+
 export default function App() {
   const [data, setData] = useState(initialData);
   const [customSchema, setCustomSchema] = useState({
@@ -58,6 +66,21 @@ export default function App() {
   const [componentsJson, setComponents] = useState({
     components: [],
   });
+  const [table, setTable] = useState(null);
+  const [columns, setColumns] = useState(null);
+
+  function selectTable(tableWithIndex) {
+    const [tableName, indexOfTable] = tableWithIndex.split("-");
+    setTable(tableName);
+    console.log(tableColumnsJson.tables[indexOfTable].columns);
+    setColumns(tableColumnsJson.tables[indexOfTable].columns);
+  }
+
+  function addComponentForColumn(value) {
+    const [label, ui] = value.split("-");
+    console.log(label, ui);
+    addComponent(ui, label);
+  }
 
   function generateSchema() {
     const { components } = componentsJson;
@@ -110,25 +133,46 @@ export default function App() {
             autocomplete: true,
           },
         });
+      } else if (eachComponent.type == "TextArea") {
+        // here code should be modified
+        myschema.properties[eachComponent.label] = {
+          type: "string",
+        };
+        myUischema.elements.push({
+          type: "Control",
+          label: eachComponent.label,
+          scope: `#/properties/${eachComponent.label}`,
+          options: {
+            multi: true,
+          },
+        });
+      } else if (eachComponent.type == "CheckBox") {
+        // here code should be modified
+        myschema.properties[eachComponent.label] = {
+          type: "boolean",
+        };
+        myUischema.elements.push({
+          type: "Control",
+          label: eachComponent.label,
+          scope: `#/properties/${eachComponent.label}`,
+        });
       }
     });
 
     setCustomSchema(myschema);
     setCustomUiSchema(myUischema);
-
-    console.log(myschema);
-    console.log(myUischema);
   }
 
-  function addComponent(value) {
+  function addComponent(value, label) {
     const newComponents = [...componentsJson.components];
 
     if (value == "RadioButton") {
       //switch case has to be implemented
       newComponents.push({
         type: "RadioButton",
-        label: "checkBoxName", // for the whole radio buttons
-        items: ["one", "two", "three", "four"],
+        leftSideLabel: label,
+        label: label, // for the whole radio buttons and for displaying the right side label
+        items: ["field 1"],
         numberOfRadios: 4,
         required: true, // may be true or false
         readOnly: false, //may be true or false
@@ -139,7 +183,8 @@ export default function App() {
     } else if (value == "SmallText") {
       newComponents.push({
         type: "SmallText",
-        label: "TextName",
+        label: label,
+        leftSideLabel: label,
         required: true,
         readOnly: false,
         disabled: false,
@@ -148,7 +193,8 @@ export default function App() {
     } else if (value == "DateTimeInput") {
       newComponents.push({
         type: "DateTimeInput",
-        label: "DateTimeName",
+        leftSideLabel: label,
+        label: label,
         required: true,
         readOnly: false,
         disable: false,
@@ -157,17 +203,95 @@ export default function App() {
     } else if (value == "enumAutoCompleteInput") {
       newComponents.push({
         type: "enumAutoCompleteInput",
-        label: "payment",
+        label: label,
+        leftSideLabel: label,
         items: ["online", "bank", "offline", "someotherway"],
         required: true,
         readOnly: false,
         disabled: false,
       });
       setComponents({ components: newComponents });
+    } else if (value == "TextArea") {
+      newComponents.push({
+        type: "TextArea",
+        label: label,
+        leftSideLabel: label,
+        required: true,
+        readOnly: false,
+        disabled: false,
+      });
+      setComponents({ components: newComponents });
+    } else if (value == "CheckBox") {
+      newComponents.push({
+        type: "CheckBox",
+        leftSideLabel: label,
+        label: label, // for the whole checkbox buttons and for displaying the right side label
+        numberOfRadios: 4,
+        required: true, // may be true or false
+        readOnly: false, //may be true or false
+        disabled: false, // may be true or false
+        //validation comes under required
+      });
+      console.log(newComponents);
+      setComponents({ components: newComponents });
     }
   }
 
+  // to be deleted
+  // function addComponent(value) {
+  //   const newComponents = [...componentsJson.components];
+
+  //   if (value == "RadioButton") {
+  //     //switch case has to be implemented
+  //     newComponents.push({
+  //       type: "RadioButton",
+  //       label: "checkBoxName", // for the whole radio buttons
+  //       items: ["one", "two", "three", "four"],
+  //       numberOfRadios: 4,
+  //       required: true, // may be true or false
+  //       readOnly: false, //may be true or false
+  //       disabled: false, // may be true or false
+  //       //validation comes under required
+  //     });
+  //     setComponents({ components: newComponents });
+  //   } else if (value == "SmallText") {
+  //     newComponents.push({
+  //       type: "SmallText",
+  //       label: "TextName",
+  //       required: true,
+  //       readOnly: false,
+  //       disabled: false,
+  //     });
+  //     setComponents({ components: newComponents });
+  //   } else if (value == "DateTimeInput") {
+  //     newComponents.push({
+  //       type: "DateTimeInput",
+  //       label: "DateTimeName",
+  //       required: true,
+  //       readOnly: false,
+  //       disable: false,
+  //     });
+  //     setComponents({ components: newComponents });
+  //   } else if (value == "enumAutoCompleteInput") {
+  //     newComponents.push({
+  //       type: "enumAutoCompleteInput",
+  //       label: "payment",
+  //       items: ["online", "bank", "offline", "someotherway"],
+  //       required: true,
+  //       readOnly: false,
+  //       disabled: false,
+  //     });
+  //     setComponents({ components: newComponents });
+  //   }
+  // }
+
   function updateSmallTextAreaLabel(value, rowIndex) {
+    const newComponents = [...componentsJson.components];
+    newComponents[rowIndex].label = value;
+    setComponents({ components: newComponents });
+  }
+
+  function updateTextAreaLabel(value, rowIndex) {
     const newComponents = [...componentsJson.components];
     newComponents[rowIndex].label = value;
     setComponents({ components: newComponents });
@@ -203,6 +327,12 @@ export default function App() {
     setComponents({ components: newComponents });
   }
 
+  function handleCheckBoxLabelChange(rowIndex, value) {
+    const newComponents = [...componentsJson.components];
+    newComponents[rowIndex].label = value;
+    setComponents({ components: newComponents });
+  }
+
   function handleEnumAutoCompleteLabel(rowIndex, value) {
     const newComponents = [...componentsJson.components];
     newComponents[rowIndex].label = value;
@@ -217,7 +347,8 @@ export default function App() {
 
   function displayComponent(component, rowIndex) {
     // console.log(component);
-    const { type, items, label } = component;
+
+    const { type, items, label, leftSideLabel } = component;
     if (type == "RadioButton") {
       return (
         <>
@@ -226,7 +357,7 @@ export default function App() {
             className="border border-gray-700 my-3 p-3 rounded-lg"
           >
             <div className="flex my-3 items-center gap-2">
-              <div className="font-bold text-xl">RadioButton Component</div>
+              <div className="font-bold text-xl">{leftSideLabel}</div>
               <RadioButtonChecked />
             </div>
             <Label>change the group label name here</Label>
@@ -272,7 +403,7 @@ export default function App() {
       return (
         <>
           <div className="border my-3 [&>*]:my-3 items-center border-gray-700 p-3 rounded-lg">
-            <h1 className="font-bold text-xl my-3">TextField Component</h1>
+            <h1 className="font-bold text-xl my-3">{leftSideLabel}</h1>
             <Label>Text Field Label : </Label>
             <Input
               type="text"
@@ -292,7 +423,7 @@ export default function App() {
         <>
           <div className="border [&>*]:my-3 border-gray-700 my-3 p-3 rounded-lg">
             <div className="flex items-center ">
-              <div className="font-bold text-xl mr-3">Date Time</div>
+              <div className="font-bold text-xl mr-3">{leftSideLabel}</div>
               <CalendarClock />
             </div>
             <Label>change the label for the date here</Label>
@@ -357,12 +488,102 @@ export default function App() {
           </div>
         </>
       );
+    } else if (type == "TextArea") {
+      return (
+        <div className="border my-3 [&>*]:my-3 items-center border-gray-700 p-3 rounded-lg">
+          <h1 className="font-bold text-xl my-3">{leftSideLabel}</h1>
+          <Label>TextArea Field Label : </Label>
+          <Input
+            type="text"
+            name="smallTextLabel"
+            defaultValue="Change Here"
+            onChange={(e) => {
+              updateTextAreaLabel(e.target.value, rowIndex);
+            }}
+          />
+        </div>
+      );
+    } else if (type == "CheckBox") {
+      return (
+        <>
+          <div
+            key={rowIndex}
+            className="border border-gray-700 my-3 p-3 rounded-lg"
+          >
+            <div className="flex my-3 items-center gap-2">
+              <div className="font-bold text-xl">{leftSideLabel}</div>
+              <CheckBoxOutlined />
+            </div>
+            <Label>change the group label name here</Label>
+            <Input
+              type="text"
+              name="CheckBoxGroupLabel"
+              defaultValue="Group Name"
+              onChange={(e) => {
+                handleCheckBoxLabelChange(rowIndex, e.target.value);
+              }}
+            />
+          </div>
+        </>
+      );
     }
   }
   return (
     <>
       <div className="w-screen max-w-7xl border-2 min-h-screen">
         {/* this is on the left side */}
+
+        <Select
+          onValueChange={(value) => {
+            selectTable(value);
+          }}
+        >
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="Select a fruit" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectGroup>
+              <SelectLabel>Tables</SelectLabel>
+              {tableColumnsJson.tables.map((eachTable, index) => {
+                return (
+                  <SelectItem
+                    value={eachTable.name + "-" + index}
+                    key={eachTable.name}
+                  >
+                    {eachTable.name}
+                  </SelectItem>
+                );
+              })}
+              <SelectItem value="pineapple">Pineapple</SelectItem>
+            </SelectGroup>
+          </SelectContent>
+        </Select>
+
+        <Select
+          onValueChange={(value) => {
+            addComponentForColumn(value);
+          }}
+        >
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="Select a column" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectGroup>
+              <SelectLabel>Columns</SelectLabel>
+              {columns?.map((eachColumn) => {
+                return (
+                  <SelectItem
+                    key={eachColumn.label + "-" + eachColumn.ui}
+                    value={eachColumn.label + "-" + eachColumn.ui}
+                  >
+                    {eachColumn.label}
+                  </SelectItem>
+                );
+              })}
+              <SelectItem value="pineapple">Pineapple</SelectItem>
+            </SelectGroup>
+          </SelectContent>
+        </Select>
 
         <div className="flex flex-col md:flex-row">
           <div className="flex-grow border-4 p-4">
@@ -375,7 +596,7 @@ export default function App() {
                 <SelectValue placeholder="Select UI" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="Checkbox">Checkbox</SelectItem>
+                <SelectItem value="CheckBox">Checkbox</SelectItem>
                 <SelectItem value="RadioButton">RadioButton</SelectItem>
                 <SelectItem value="DropDown">DropDown</SelectItem>
                 <SelectItem value="enumAutoCompleteInput">

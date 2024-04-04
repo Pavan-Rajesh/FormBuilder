@@ -19,6 +19,167 @@ export const schema = {
     },
   },
 };
+
+export const tableColumnsJson = {
+  tables: [
+    {
+      name: "users",
+      columns: [
+        { label: "ID", key: "id", type: "integer", ui: "CheckBox" },
+        { label: "Name", key: "name", type: "string", ui: "SmallText" },
+        { label: "Email", key: "email", type: "string", ui: "SmallText" },
+        { label: "Password", key: "password", type: "string", ui: "SmallText" }, // to be replace by password
+        {
+          label: "Created At",
+          key: "created_at",
+          type: "datetime",
+          ui: "DateTimeInput",
+        },
+        {
+          label: "Updated At",
+          key: "updated_at",
+          type: "datetime",
+          ui: "DateTimeInput",
+        },
+        {
+          label: "Status",
+          key: "status",
+          type: "string",
+          ui: "RadioButton",
+          options: [
+            { label: "Pending", value: "pending" },
+            { label: "Shipped", value: "shipped" },
+            { label: "Delivered", value: "delivered" },
+            { label: "Cancelled", value: "cancelled" },
+          ],
+        },
+      ],
+    },
+    {
+      name: "products",
+      columns: [
+        { label: "ID", key: "id", type: "integer", ui: "text" },
+        { label: "Name", key: "name", type: "string", ui: "text" },
+        {
+          label: "Description",
+          key: "description",
+          type: "text",
+          ui: "textarea",
+        },
+        { label: "Price", key: "price", type: "decimal", ui: "text" },
+        {
+          label: "Category ID",
+          key: "category_id",
+          type: "integer",
+          ui: "select",
+        },
+        {
+          label: "Created At",
+          key: "created_at",
+          type: "datetime",
+          ui: "text",
+        },
+        {
+          label: "Updated At",
+          key: "updated_at",
+          type: "datetime",
+          ui: "text",
+        },
+      ],
+    },
+    {
+      name: "orders",
+      columns: [
+        { label: "ID", key: "id", type: "integer", ui: "text" },
+        { label: "User ID", key: "user_id", type: "integer", ui: "select" },
+        {
+          label: "Total Amount",
+          key: "total_amount",
+          type: "decimal",
+          ui: "text",
+        },
+        {
+          label: "Status",
+          key: "status",
+          type: "string",
+          ui: "radio",
+          options: [
+            { label: "Pending", value: "pending" },
+            { label: "Shipped", value: "shipped" },
+            { label: "Delivered", value: "delivered" },
+            { label: "Cancelled", value: "cancelled" },
+          ],
+        },
+        {
+          label: "Created At",
+          key: "created_at",
+          type: "datetime",
+          ui: "text",
+        },
+        {
+          label: "Updated At",
+          key: "updated_at",
+          type: "datetime",
+          ui: "text",
+        },
+      ],
+    },
+    {
+      name: "order_items",
+      columns: [
+        { label: "ID", key: "id", type: "integer", ui: "text" },
+        { label: "Order ID", key: "order_id", type: "integer", ui: "select" },
+        {
+          label: "Product ID",
+          key: "product_id",
+          type: "integer",
+          ui: "select",
+        },
+        { label: "Quantity", key: "quantity", type: "integer", ui: "text" },
+        { label: "Price", key: "price", type: "decimal", ui: "text" },
+        {
+          label: "Created At",
+          key: "created_at",
+          type: "datetime",
+          ui: "text",
+        },
+        {
+          label: "Updated At",
+          key: "updated_at",
+          type: "datetime",
+          ui: "text",
+        },
+      ],
+    },
+    {
+      name: "categories",
+      columns: [
+        { label: "ID", key: "id", type: "integer", ui: "text" },
+        { label: "Name", key: "name", type: "string", ui: "text" },
+        {
+          label: "Description",
+          key: "description",
+          type: "text",
+          ui: "textarea",
+        },
+        { label: "Parent ID", key: "parent_id", type: "integer", ui: "select" },
+        {
+          label: "Created At",
+          key: "created_at",
+          type: "datetime",
+          ui: "text",
+        },
+        {
+          label: "Updated At",
+          key: "updated_at",
+          type: "datetime",
+          ui: "text",
+        },
+      ],
+    },
+  ],
+};
+
 export const uischema = {
   type: "HorizontalLayout",
   elements: [

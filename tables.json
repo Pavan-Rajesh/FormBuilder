@@ -3,7 +3,7 @@
     {
       "name": "users",
       "columns": [
-        { "label": "ID", "key": "id", "type": "integer" },
+        { "label": "ID", "key": "id", "type": "CheckBox" },
         { "label": "Name", "key": "name", "type": "string" },
         { "label": "Email", "key": "email", "type": "string" },
         { "label": "Password", "key": "password", "type": "string" },
