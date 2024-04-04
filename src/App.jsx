@@ -12,7 +12,7 @@ import {
   SelectLabel,
 } from "@/components/ui/select";
 
-import { CalendarClock,Trash2 } from "lucide-react";
+import { CalendarClock, Trash2, X } from "lucide-react";
 import { JsonForms } from "@jsonforms/react";
 import { useState } from "react";
 import {
@@ -68,6 +68,14 @@ export default function App() {
   });
   const [table, setTable] = useState(null);
   const [columns, setColumns] = useState(null);
+
+  function deleteComponent(rowIndex) {
+    const newComponents = [...componentsJson.components];
+    const newOnes = newComponents.filter((component, index) => {
+      return rowIndex != index;
+    });
+    setComponents({ components: newOnes });
+  }
 
   function selectTable(tableWithIndex) {
     const [tableName, indexOfTable] = tableWithIndex.split("-");
@@ -165,7 +173,7 @@ export default function App() {
 
   function addComponent(value, label) {
     const newComponents = [...componentsJson.components];
-
+    console.log(value, label);
     if (value == "RadioButton") {
       //switch case has to be implemented
       newComponents.push({
@@ -205,7 +213,7 @@ export default function App() {
         type: "enumAutoCompleteInput",
         label: label,
         leftSideLabel: label,
-        items: ["online", "bank", "offline", "someotherway"],
+        items: ["field 1"],
         required: true,
         readOnly: false,
         disabled: false,
@@ -304,8 +312,23 @@ export default function App() {
   }
 
   function handleAddOptionEnumAutoComplete(rowindex) {
+    // console.log(componentsJson.components);
+
+    const modifiedComponents = [...componentsJson.components];
+
+    modifiedComponents[rowindex].items.push("another");
+    console.log(modifiedComponents);
+    setComponents({ components: modifiedComponents });
+  }
+
+  function deleteInnerComponent(rowIndex, columnIndex) {
     const newComponents = [...componentsJson.components];
-    newComponents[rowindex].items.push("another");
+
+    const radios = newComponents[rowIndex].items;
+    const newRadios = radios.filter((eachRadio, index) => {
+      return index != columnIndex;
+    });
+    newComponents[rowIndex].items = newRadios;
     setComponents({ components: newComponents });
   }
 
@@ -349,18 +372,24 @@ export default function App() {
     // console.log(component);
 
     const { type, items, label, leftSideLabel } = component;
+
     if (type == "RadioButton") {
       return (
         <>
           <div
             key={rowIndex}
-            className="border border-gray-700 my-3 p-3 rounded-lg"
+            className="border border-gray-700 my-3 p-3 rounded-lg relative"
           >
             <div className="flex my-3 items-center gap-2">
               <div className="font-bold text-xl">{leftSideLabel}</div>
               <RadioButtonChecked />
             </div>
             <Label>change the group label name here</Label>
+            <Trash2
+              color="red"
+              className="absolute right-5 top-5 hover:cursor-pointer"
+              onClick={() => deleteComponent(rowIndex)}
+            />
             <Input
               type="text"
               name="radioGroupLabel"
@@ -372,17 +401,32 @@ export default function App() {
 
             {items.map((eachItem, columnIndex) => {
               return (
-                <div key={`${rowIndex}+${columnIndex}`} className="flex my-2">
-                  <Label> Radio - {columnIndex + 1} Label </Label>
-                  <Input
-                    type="text"
-                    value={eachItem}
-                    onChange={(e) => {
-                      handleLabelRadioChange(
-                        rowIndex,
-                        columnIndex,
-                        e.target.value
-                      );
+                <div
+                  key={`${rowIndex}+${columnIndex}`}
+                  className="flex my-2 relative border rounded-sm "
+                >
+                  <div className="flex items-center w-full">
+                    <Label> Radio - {columnIndex + 1} Label </Label>
+
+                    <Input
+                      type="text"
+                      value={eachItem}
+                      className="outline-none border-none w-full"
+                      onChange={(e) => {
+                        handleLabelRadioChange(
+                          rowIndex,
+                          columnIndex,
+                          e.target.value
+                        );
+                      }}
+                    />
+                  </div>
+
+                  <X
+                    color="red"
+                    className="absolute right-5 top-2 hover:cursor-pointer"
+                    onClick={() => {
+                      deleteInnerComponent(rowIndex, columnIndex);
                     }}
                   />
                 </div>
@@ -402,9 +446,14 @@ export default function App() {
     } else if (type == "SmallText") {
       return (
         <>
-          <div className="border my-3 [&>*]:my-3 items-center border-gray-700 p-3 rounded-lg">
+          <div className="border my-3 [&>*]:my-3 items-center border-gray-700 p-3 rounded-lg relative">
             <h1 className="font-bold text-xl my-3">{leftSideLabel}</h1>
             <Label>Text Field Label : </Label>
+            <Trash2
+              color="red"
+              className="absolute right-5 top-5 hover:cursor-pointer"
+              onClick={() => deleteComponent(rowIndex)}
+            />
             <Input
               type="text"
               name="smallTextLabel"
@@ -421,12 +470,17 @@ export default function App() {
     } else if (type == "DateTimeInput") {
       return (
         <>
-          <div className="border [&>*]:my-3 border-gray-700 my-3 p-3 rounded-lg">
+          <div className="border [&>*]:my-3 border-gray-700 my-3 p-3 rounded-lg relative">
             <div className="flex items-center ">
               <div className="font-bold text-xl mr-3">{leftSideLabel}</div>
               <CalendarClock />
             </div>
             <Label>change the label for the date here</Label>
+            <Trash2
+              color="red"
+              className="absolute right-5 top-5 hover:cursor-pointer"
+              onClick={() => deleteComponent(rowIndex)}
+            />
             <Input
               type="text"
               name="DateTimeFieldLabel"
@@ -439,13 +493,18 @@ export default function App() {
     } else if (type == "enumAutoCompleteInput") {
       return (
         <>
-          <div className="border border-gray-700 my-3 p-3 rounded-lg">
+          <div className="border border-gray-700 my-3 p-3 rounded-lg relative">
             <div className="flex gap-2 items-center">
               <div className="font-bold text-xl">AutoComplete Component</div>
               <AutoAwesome />
             </div>
             <div>
               <Label>change the group label name here</Label>
+              <Trash2
+                color="red"
+                className="absolute right-5 top-5 hover:cursor-pointer"
+                onClick={() => deleteComponent(rowIndex)}
+              />
               <Input
                 type="text"
                 name="enumAutoCompleteInputLabel"
@@ -459,20 +518,28 @@ export default function App() {
               return (
                 <div
                   key={`${rowIndex}+${columnIndex}`}
-                  className="flex  items-center my-3"
+                  className="flex  items-center my-3 relative"
                 >
-                  <Label>DropDown Option {columnIndex + 1}</Label>
-                  <Input
-                    type="text"
-                    defaultValue={eachItem}
-                    name="EnumAutoCompleteValueInput"
-                    onChange={(e) => {
-                      EnumAutoCompleteValueInput(
-                        rowIndex,
-                        columnIndex,
-                        e.target.value
-                      );
-                    }}
+                  <div className="w-full">
+                    <Label>DropDown Option {columnIndex + 1}</Label>
+                    <Input
+                      type="text"
+                      defaultValue={eachItem}
+                      name="EnumAutoCompleteValueInput"
+                      className="w-full"
+                      onChange={(e) => {
+                        EnumAutoCompleteValueInput(
+                          rowIndex,
+                          columnIndex,
+                          e.target.value
+                        );
+                      }}
+                    />
+                  </div>
+                  <X
+                    color="red"
+                    className="absolute top-8 right-5 cursor-pointer"
+                    onClick={deleteInnerComponent(rowIndex, columnIndex)}
                   />
                 </div>
               );
@@ -490,9 +557,14 @@ export default function App() {
       );
     } else if (type == "TextArea") {
       return (
-        <div className="border my-3 [&>*]:my-3 items-center border-gray-700 p-3 rounded-lg">
+        <div className="border my-3 [&>*]:my-3 items-center border-gray-700 p-3 rounded-lg relative">
           <h1 className="font-bold text-xl my-3">{leftSideLabel}</h1>
           <Label>TextArea Field Label : </Label>
+          <Trash2
+            color="red"
+            className="absolute right-5 top-5 hover:cursor-pointer"
+            onClick={() => deleteComponent(rowIndex)}
+          />
           <Input
             type="text"
             name="smallTextLabel"
@@ -508,13 +580,18 @@ export default function App() {
         <>
           <div
             key={rowIndex}
-            className="border border-gray-700 my-3 p-3 rounded-lg"
+            className="border border-gray-700 my-3 p-3 rounded-lg relative"
           >
             <div className="flex my-3 items-center gap-2">
               <div className="font-bold text-xl">{leftSideLabel}</div>
               <CheckBoxOutlined />
             </div>
             <Label>change the group label name here</Label>
+            <Trash2
+              color="red"
+              className="absolute right-5 top-5 hover:cursor-pointer"
+              onClick={() => deleteComponent(rowIndex)}
+            />
             <Input
               type="text"
               name="CheckBoxGroupLabel"

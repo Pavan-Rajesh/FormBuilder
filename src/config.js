@@ -25,7 +25,12 @@ export const tableColumnsJson = {
     {
       name: "users",
       columns: [
-        { label: "ID", key: "id", type: "integer", ui: "CheckBox" },
+        {
+          label: "ID",
+          key: "id",
+          type: "integer",
+          ui: "enumAutoCompleteInput",
+        },
         { label: "Name", key: "name", type: "string", ui: "SmallText" },
         { label: "Email", key: "email", type: "string", ui: "SmallText" },
         { label: "Password", key: "password", type: "string", ui: "SmallText" }, // to be replace by password
