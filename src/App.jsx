@@ -31,37 +31,11 @@ export default function App() {
   const [data, setData] = useState(initialData);
   const [customSchema, setCustomSchema] = useState({
     type: "object",
-    properties: {
-      exampleRadioEnum: {
-        type: "string",
-        enum: ["One", "Two", "Three"],
-      },
-      example2: {
-        type: "string",
-        enum: ["5", "hello", "2", "90"],
-      },
-    },
+    properties: {},
   });
   const [customUiSchema, setCustomUiSchema] = useState({
     type: "VerticalLayout",
-    elements: [
-      {
-        type: "Control",
-        label: "Name",
-        scope: "#/properties/exampleRadioEnum",
-        options: {
-          format: "radio",
-        },
-      },
-      {
-        type: "Control",
-        label: "Birth Date",
-        scope: "#/properties/example2",
-        options: {
-          format: "radio",
-        },
-      },
-    ],
+    elements: [],
   });
   const [componentsJson, setComponents] = useState({
     components: [],
@@ -86,7 +60,8 @@ export default function App() {
 
   function addComponentForColumn(value) {
     const [label, ui] = value.split("-");
-    console.log(label, ui);
+    console.log(ui, label);
+
     addComponent(ui, label);
   }
 
@@ -176,6 +151,7 @@ export default function App() {
     console.log(value, label);
     if (value == "RadioButton") {
       //switch case has to be implemented
+
       newComponents.push({
         type: "RadioButton",
         leftSideLabel: label,
@@ -213,11 +189,12 @@ export default function App() {
         type: "enumAutoCompleteInput",
         label: label,
         leftSideLabel: label,
-        items: ["field 1"],
+        items: ["s", "sdfsdfsd"],
         required: true,
         readOnly: false,
         disabled: false,
       });
+      console.log(newComponents); // items array is becoming empty after pushing into newComponents bug!!
       setComponents({ components: newComponents });
     } else if (value == "TextArea") {
       newComponents.push({
@@ -315,7 +292,6 @@ export default function App() {
     // console.log(componentsJson.components);
 
     const modifiedComponents = [...componentsJson.components];
-
     modifiedComponents[rowindex].items.push("another");
     console.log(modifiedComponents);
     setComponents({ components: modifiedComponents });
@@ -332,6 +308,16 @@ export default function App() {
     setComponents({ components: newComponents });
   }
 
+  function deleteInnerComponentEnum(rowIndex, columnIndex) {
+    const newComponents = [...componentsJson.components];
+
+    const enums = newComponents[rowIndex].items;
+    const newEnums = enums.filter((eachRadio, index) => {
+      return index != columnIndex;
+    });
+    newComponents[rowIndex].items = newEnums;
+    setComponents({ components: newComponents });
+  }
   function handleChangeRadio(index) {
     const newComponents = [...componentsJson.components];
     newComponents[index].items.push("another");
@@ -539,7 +525,7 @@ export default function App() {
                   <X
                     color="red"
                     className="absolute top-8 right-5 cursor-pointer"
-                    onClick={deleteInnerComponent(rowIndex, columnIndex)}
+                    onClick={deleteInnerComponentEnum(rowIndex, columnIndex)}
                   />
                 </div>
               );
@@ -548,7 +534,10 @@ export default function App() {
               type="Button"
               className="border"
               name="addOptionEnumAutoComplete"
-              onClick={() => handleAddOptionEnumAutoComplete(rowIndex)}
+              onClick={() => {
+                handleAddOptionEnumAutoComplete(rowIndex);
+                console.log(componentsJson);
+              }}
             >
               click to add option for auto complete
             </Button>
@@ -609,58 +598,62 @@ export default function App() {
     <>
       <div className="w-screen max-w-7xl border-2 min-h-screen">
         {/* this is on the left side */}
-
-        <Select
-          onValueChange={(value) => {
-            selectTable(value);
-          }}
+        <div
+          className="flex my-5 justify-start [&>*]:m-5 items-center
+        "
         >
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Select a fruit" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectGroup>
-              <SelectLabel>Tables</SelectLabel>
-              {tableColumnsJson.tables.map((eachTable, index) => {
-                return (
-                  <SelectItem
-                    value={eachTable.name + "-" + index}
-                    key={eachTable.name}
-                  >
-                    {eachTable.name}
-                  </SelectItem>
-                );
-              })}
-              <SelectItem value="pineapple">Pineapple</SelectItem>
-            </SelectGroup>
-          </SelectContent>
-        </Select>
+          <Select
+            onValueChange={(value) => {
+              selectTable(value);
+            }}
+          >
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Select a Table" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                <SelectLabel>Tables</SelectLabel>
+                {tableColumnsJson.tables.map((eachTable, index) => {
+                  return (
+                    <SelectItem
+                      value={eachTable.name + "-" + index}
+                      key={eachTable.name}
+                    >
+                      {eachTable.name}
+                    </SelectItem>
+                  );
+                })}
+                <SelectItem value="pineapple">Pineapple</SelectItem>
+              </SelectGroup>
+            </SelectContent>
+          </Select>
 
-        <Select
-          onValueChange={(value) => {
-            addComponentForColumn(value);
-          }}
-        >
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Select a column" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectGroup>
-              <SelectLabel>Columns</SelectLabel>
-              {columns?.map((eachColumn) => {
-                return (
-                  <SelectItem
-                    key={eachColumn.label + "-" + eachColumn.ui}
-                    value={eachColumn.label + "-" + eachColumn.ui}
-                  >
-                    {eachColumn.label}
-                  </SelectItem>
-                );
-              })}
-              <SelectItem value="pineapple">Pineapple</SelectItem>
-            </SelectGroup>
-          </SelectContent>
-        </Select>
+          <Select
+            onValueChange={(value) => {
+              addComponentForColumn(value);
+            }}
+          >
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Select a column" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                <SelectLabel>Columns</SelectLabel>
+                {columns?.map((eachColumn) => {
+                  return (
+                    <SelectItem
+                      key={eachColumn.label + "-" + eachColumn.ui}
+                      value={eachColumn.label + "-" + eachColumn.ui}
+                    >
+                      {eachColumn.label}
+                    </SelectItem>
+                  );
+                })}
+                <SelectItem value="pineapple">Pineapple</SelectItem>
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+        </div>
 
         <div className="flex flex-col md:flex-row">
           <div className="flex-grow border-4 p-4">
@@ -670,14 +663,14 @@ export default function App() {
               }}
             >
               <SelectTrigger className="w-[180px]">
-                <SelectValue placeholder="Select UI" />
+                <SelectValue placeholder="Select UI for testing" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="CheckBox">Checkbox</SelectItem>
                 <SelectItem value="RadioButton">RadioButton</SelectItem>
-                <SelectItem value="DropDown">DropDown</SelectItem>
-                <SelectItem value="enumAutoCompleteInput">
-                  Enum auto Complete Input
+
+                <SelectItem disabled value="enumAutoCompleteInput">
+                  Enum auto Complete Input - bug
                 </SelectItem>
                 <SelectItem value="SmallText">SmallText</SelectItem>
                 <SelectItem value="TextArea">Textarea</SelectItem>
@@ -715,7 +708,14 @@ export default function App() {
                   setData(data);
                 }}
               />
-              <Button className="bg-green-600">submit</Button>
+              <Button
+                className="bg-green-600"
+                onClick={() => {
+                  console.log(data);
+                }}
+              >
+                submit
+              </Button>
             </div>
           </div>
         </div>

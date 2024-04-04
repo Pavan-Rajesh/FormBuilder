@@ -29,7 +29,7 @@ export const tableColumnsJson = {
           label: "ID",
           key: "id",
           type: "integer",
-          ui: "enumAutoCompleteInput",
+          ui: "SmallText",
         },
         { label: "Name", key: "name", type: "string", ui: "SmallText" },
         { label: "Email", key: "email", type: "string", ui: "SmallText" },
