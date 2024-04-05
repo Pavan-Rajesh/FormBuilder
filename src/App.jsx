@@ -11,7 +11,7 @@ import {
   SelectGroup,
   SelectLabel,
 } from "@/components/ui/select";
-
+import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import { CalendarClock, Trash2, X } from "lucide-react";
 import { JsonForms } from "@jsonforms/react";
 import { useState } from "react";
@@ -22,6 +22,7 @@ import {
 } from "@mui/icons-material";
 // eslint-disable-next-line no-unused-vars
 import { schema, uischema, initialData, tableColumnsJson } from "./config";
+// This Component will be getting tableColumnsJson as a prop
 
 import { Button, buttonVariants } from "./components/ui/button";
 import { Input } from "./components/ui/input";
@@ -42,6 +43,16 @@ export default function App() {
   });
   const [table, setTable] = useState(null);
   const [columns, setColumns] = useState(null);
+
+  const onDragEnd = (result) => {
+    if (!result.destination) return;
+
+    const items = Array.from(componentsJson.components);
+    const [reorderedItem] = items.splice(result.source.index, 1);
+    items.splice(result.destination.index, 0, reorderedItem);
+
+    setComponents({ components: items });
+  };
 
   function deleteComponent(rowIndex) {
     const newComponents = [...componentsJson.components];
@@ -186,6 +197,7 @@ export default function App() {
       setComponents({ components: newComponents });
     } else if (value == "enumAutoCompleteInput") {
       newComponents.push({
+        // not working
         type: "enumAutoCompleteInput",
         label: label,
         leftSideLabel: label,
@@ -678,9 +690,32 @@ export default function App() {
               </SelectContent>
             </Select>
 
-            {componentsJson.components.map((eachComponent, index) => {
-              return displayComponent(eachComponent, index);
-            })}
+            <DragDropContext onDragEnd={onDragEnd}>
+              <Droppable droppableId="tasks">
+                {(provided) => (
+                  <div ref={provided.innerRef} {...provided.droppableProps}>
+                    {componentsJson.components.map((eachComponent, index) => (
+                      <Draggable
+                        key={index}
+                        draggableId={index.toString()}
+                        index={index}
+                      >
+                        {(provided) => (
+                          <div
+                            {...provided.draggableProps}
+                            {...provided.dragHandleProps}
+                            ref={provided.innerRef}
+                          >
+                            {displayComponent(eachComponent, index)}
+                          </div>
+                        )}
+                      </Draggable>
+                    ))}
+                    {provided.placeholder}
+                  </div>
+                )}
+              </Droppable>
+            </DragDropContext>
 
             <Button
               type="Button"
