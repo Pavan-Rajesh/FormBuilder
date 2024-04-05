@@ -609,7 +609,6 @@ export default function App() {
   return (
     <>
       <div className="w-screen max-w-7xl border-2 min-h-screen">
-        {/* this is on the left side */}
         <div
           className="flex my-5 justify-start [&>*]:m-5 items-center
         "
@@ -668,7 +667,8 @@ export default function App() {
         </div>
 
         <div className="flex flex-col md:flex-row">
-          <div className="flex-grow border-4 p-4">
+          {/* this is on the left side */}
+          <div className=" border-4 p-4 flex-shrink-0 md:w-1/2 ">
             <Select
               onValueChange={(value) => {
                 addComponent(value);
@@ -731,7 +731,7 @@ export default function App() {
             </Button>
           </div>
           {/* this should be on the right side */}
-          <div className="flex-grow  border-4 p-4">
+          <div className="  border-4 p-4 flex-shrink-0 md:w-1/2">
             <div>
               <JsonForms
                 schema={customSchema}
